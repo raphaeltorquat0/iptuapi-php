@@ -86,14 +86,14 @@ class IPTUClient
     /**
      * Busca dados de IPTU por endereço para qualquer cidade suportada.
      *
-     * Cidades suportadas: "sao_paulo", "belo_horizonte"
+     * Cidades suportadas: "sao_paulo", "belo_horizonte", "recife"
      *
-     * @param string $cidade Cidade ("sao_paulo" ou "belo_horizonte")
+     * @param string $cidade Cidade ("sao_paulo", "belo_horizonte" ou "recife")
      * @param string $logradouro Nome da rua/avenida
      * @param int|null $numero Número do imóvel (opcional)
-     * @param int $ano Ano de referência (default: 2024)
+     * @param int $ano Ano de referência (default: 2025)
      * @param int $limit Limite de resultados (default: 20)
-     * @return array Lista de imóveis encontrados
+     * @return array Lista de imóveis encontrados (Recife inclui lat/long)
      * @throws IPTUAPIException
      *
      * @example
@@ -101,12 +101,14 @@ class IPTUClient
      * $resultados = $client->consultaIPTU('sao_paulo', 'Paulista', 1000);
      * // Belo Horizonte
      * $resultados = $client->consultaIPTU('belo_horizonte', 'Afonso Pena');
+     * // Recife (com coordenadas)
+     * $resultados = $client->consultaIPTU('recife', 'Boa Viagem', null, 2025);
      */
     public function consultaIPTU(
         string $cidade,
         string $logradouro,
         ?int $numero = null,
-        int $ano = 2024,
+        int $ano = 2025,
         int $limit = 20
     ): array {
         $params = [
@@ -126,11 +128,12 @@ class IPTUClient
      *
      * Para São Paulo: use o número SQL (ex: "00904801381")
      * Para Belo Horizonte: use o Índice Cadastral (ex: "007028 005 0086")
+     * Para Recife: use o número do contribuinte
      *
-     * @param string $cidade Cidade ("sao_paulo" ou "belo_horizonte")
-     * @param string $identificador Número SQL (SP) ou Índice Cadastral (BH)
+     * @param string $cidade Cidade ("sao_paulo", "belo_horizonte" ou "recife")
+     * @param string $identificador Número SQL (SP), Índice Cadastral (BH) ou Contribuinte (Recife)
      * @param int|null $ano Ano de referência (opcional)
-     * @return array Lista de dados do imóvel
+     * @return array Lista de dados do imóvel (Recife inclui lat/long)
      * @throws IPTUAPIException
      *
      * @example
@@ -138,6 +141,8 @@ class IPTUClient
      * $resultados = $client->consultaIPTUSQL('sao_paulo', '00904801381');
      * // Belo Horizonte
      * $resultados = $client->consultaIPTUSQL('belo_horizonte', '007028 005 0086');
+     * // Recife
+     * $resultados = $client->consultaIPTUSQL('recife', '123456789');
      */
     public function consultaIPTUSQL(
         string $cidade,
