@@ -1,6 +1,6 @@
 # IPTU API - PHP SDK
 
-SDK oficial PHP para integracao com a IPTU API. Acesso a dados de IPTU de mais de 10 cidades brasileiras.
+SDK oficial PHP para integracao com a IPTU API. Acesso a dados de IPTU de Sao Paulo, Belo Horizonte e Recife.
 
 [![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue)](https://php.net)
 [![Packagist Version](https://img.shields.io/packagist/v/iptuapi/iptuapi-php)](https://packagist.org/packages/iptuapi/iptuapi-php)
@@ -280,15 +280,8 @@ IPTUAPIException (base)
 | Codigo | Cidade |
 |--------|--------|
 | sp | Sao Paulo |
-| rj | Rio de Janeiro |
 | bh | Belo Horizonte |
 | recife | Recife |
-| curitiba | Curitiba |
-| poa | Porto Alegre |
-| salvador | Salvador |
-| fortaleza | Fortaleza |
-| campinas | Campinas |
-| santos | Santos |
 
 ## Exemplo Completo
 
