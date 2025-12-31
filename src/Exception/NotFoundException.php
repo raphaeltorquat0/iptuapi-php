@@ -9,8 +9,31 @@ namespace IPTUAPI\Exception;
  */
 class NotFoundException extends IPTUAPIException
 {
-    public function __construct(string $message = 'Recurso não encontrado')
+    private ?string $resource;
+
+    public function __construct(
+        string $message = 'Recurso não encontrado',
+        ?string $resource = null,
+        ?string $requestId = null
+    ) {
+        parent::__construct($message, 404, $requestId);
+        $this->resource = $resource;
+    }
+
+    public function getResource(): ?string
     {
-        parent::__construct($message, 404);
+        return $this->resource;
+    }
+
+    public function isRetryable(): bool
+    {
+        return false;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'resource' => $this->resource,
+        ]);
     }
 }

@@ -9,8 +9,31 @@ namespace IPTUAPI\Exception;
  */
 class RateLimitException extends IPTUAPIException
 {
-    public function __construct(string $message = 'Limite de requisições excedido')
+    private ?int $retryAfter;
+
+    public function __construct(
+        string $message = 'Limite de requisições excedido',
+        ?int $retryAfter = null,
+        ?string $requestId = null
+    ) {
+        parent::__construct($message, 429, $requestId);
+        $this->retryAfter = $retryAfter;
+    }
+
+    public function getRetryAfter(): ?int
     {
-        parent::__construct($message, 429);
+        return $this->retryAfter;
+    }
+
+    public function isRetryable(): bool
+    {
+        return true;
+    }
+
+    public function toArray(): array
+    {
+        return array_merge(parent::toArray(), [
+            'retry_after' => $this->retryAfter,
+        ]);
     }
 }
