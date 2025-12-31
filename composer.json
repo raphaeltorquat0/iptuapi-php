@@ -1,12 +1,14 @@
 {
     "name": "raphaeltorquat0/iptuapi-php",
-    "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo",
+    "version": "1.1.0",
+    "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo e Belo Horizonte",
     "type": "library",
     "license": "MIT",
     "keywords": [
         "iptu",
         "api",
         "são paulo",
+        "belo horizonte",
         "imóveis",
         "dados"
     ],

@@ -84,6 +84,76 @@ class IPTUClient
     }
 
     /**
+     * Busca dados de IPTU por endereço para qualquer cidade suportada.
+     *
+     * Cidades suportadas: "sao_paulo", "belo_horizonte"
+     *
+     * @param string $cidade Cidade ("sao_paulo" ou "belo_horizonte")
+     * @param string $logradouro Nome da rua/avenida
+     * @param int|null $numero Número do imóvel (opcional)
+     * @param int $ano Ano de referência (default: 2024)
+     * @param int $limit Limite de resultados (default: 20)
+     * @return array Lista de imóveis encontrados
+     * @throws IPTUAPIException
+     *
+     * @example
+     * // São Paulo
+     * $resultados = $client->consultaIPTU('sao_paulo', 'Paulista', 1000);
+     * // Belo Horizonte
+     * $resultados = $client->consultaIPTU('belo_horizonte', 'Afonso Pena');
+     */
+    public function consultaIPTU(
+        string $cidade,
+        string $logradouro,
+        ?int $numero = null,
+        int $ano = 2024,
+        int $limit = 20
+    ): array {
+        $params = [
+            'logradouro' => $logradouro,
+            'ano' => $ano,
+            'limit' => $limit,
+        ];
+        if ($numero !== null) {
+            $params['numero'] = $numero;
+        }
+
+        return $this->request('GET', "/dados/iptu/{$cidade}/endereco", $params);
+    }
+
+    /**
+     * Busca dados de IPTU pelo identificador único do imóvel.
+     *
+     * Para São Paulo: use o número SQL (ex: "00904801381")
+     * Para Belo Horizonte: use o Índice Cadastral (ex: "007028 005 0086")
+     *
+     * @param string $cidade Cidade ("sao_paulo" ou "belo_horizonte")
+     * @param string $identificador Número SQL (SP) ou Índice Cadastral (BH)
+     * @param int|null $ano Ano de referência (opcional)
+     * @return array Lista de dados do imóvel
+     * @throws IPTUAPIException
+     *
+     * @example
+     * // São Paulo
+     * $resultados = $client->consultaIPTUSQL('sao_paulo', '00904801381');
+     * // Belo Horizonte
+     * $resultados = $client->consultaIPTUSQL('belo_horizonte', '007028 005 0086');
+     */
+    public function consultaIPTUSQL(
+        string $cidade,
+        string $identificador,
+        ?int $ano = null
+    ): array {
+        $params = [];
+        if ($ano !== null) {
+            $params['ano'] = $ano;
+        }
+
+        $encodedId = rawurlencode($identificador);
+        return $this->request('GET', "/dados/iptu/{$cidade}/sql/{$encodedId}", $params ?: null);
+    }
+
+    /**
      * Executa uma requisição à API.
      */
     private function request(
