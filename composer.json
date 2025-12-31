@@ -1,5 +1,5 @@
 {
-    "name": "iptuapi/iptuapi-php",
+    "name": "raphaeltorquat0/iptuapi-php",
     "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo",
     "type": "library",
     "license": "MIT",

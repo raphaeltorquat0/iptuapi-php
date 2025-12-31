@@ -5,7 +5,7 @@ SDK oficial para integração com a IPTU API.
 ## Instalação
 
 ```bash
-composer require iptuapi/iptuapi-php
+composer require raphaeltorquat0/iptuapi-php
 ```
 
 ## Uso Rápido
