@@ -4,7 +4,7 @@ SDK oficial PHP para integracao com a IPTU API. Acesso a dados de IPTU de Sao Pa
 
 [![PHP Version](https://img.shields.io/badge/php-8.1%2B-blue)](https://php.net)
 [![Packagist Version](https://img.shields.io/packagist/v/iptuapi/iptuapi-php)](https://packagist.org/packages/iptuapi/iptuapi-php)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![License](https://img.shields.io/badge/license-Proprietary-red)](LICENSE)
 
 ## Instalacao
 
@@ -339,7 +339,9 @@ foreach ($enderecos as $endereco) {
 
 ## Licenca
 
-MIT License - veja [LICENSE](LICENSE) para detalhes.
+Copyright (c) 2025-2026 IPTU API. Todos os direitos reservados.
+
+Este software e propriedade exclusiva da IPTU API. O uso esta sujeito aos termos de servico disponiveis em https://iptuapi.com.br/termos
 
 ## Links
 
