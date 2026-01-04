@@ -35,7 +35,7 @@ use Psr\Log\NullLogger;
  */
 class IPTUClient
 {
-    public const VERSION = '2.0.0';
+    public const VERSION = '2.1.0';
 
     private const DEFAULT_BASE_URL = 'https://iptuapi.com.br/api/v1';
     private const DEFAULT_TIMEOUT = 30;
@@ -239,6 +239,64 @@ class IPTUClient
             'cidade' => $cidade,
             'limit' => $limit,
         ]);
+    }
+
+    /**
+     * Avalia imóvel por endereço OU número SQL.
+     * Combina dados do modelo AVM (ML) com transações ITBI reais.
+     * Disponível apenas para planos Pro e Enterprise.
+     *
+     * @param array $params Parâmetros da avaliação:
+     *   - sql: Número SQL do imóvel (alternativa ao endereço)
+     *   - logradouro: Nome da rua/avenida (alternativa ao SQL)
+     *   - numero: Número do imóvel
+     *   - complemento: Apartamento, sala, etc.
+     *   - bairro: Bairro
+     *   - cidade: Código da cidade (sp, bh)
+     *   - incluir_itbi: Incluir estimativa baseada em ITBI (default: true)
+     *   - incluir_comparaveis: Incluir imóveis comparáveis (default: true)
+     * @return array Avaliação completa com valor_final, avaliacao_avm, avaliacao_itbi, etc.
+     * @throws IPTUAPIException
+     *
+     * @example Por SQL
+     * $result = $client->valuationEvaluate([
+     *     'sql' => '123.456.0001-0',
+     *     'cidade' => 'sp',
+     * ]);
+     *
+     * @example Por endereço
+     * $result = $client->valuationEvaluate([
+     *     'logradouro' => 'Avenida Paulista',
+     *     'numero' => 1000,
+     *     'cidade' => 'sp',
+     * ]);
+     */
+    public function valuationEvaluate(array $params): array
+    {
+        $body = [
+            'cidade' => $params['cidade'] ?? 'sp',
+            'incluir_itbi' => $params['incluir_itbi'] ?? true,
+            'incluir_comparaveis' => $params['incluir_comparaveis'] ?? true,
+        ];
+
+        if (isset($params['sql'])) {
+            $body['sql'] = $params['sql'];
+        } else {
+            if (isset($params['logradouro'])) {
+                $body['logradouro'] = $params['logradouro'];
+            }
+            if (isset($params['numero'])) {
+                $body['numero'] = $params['numero'];
+            }
+            if (isset($params['complemento'])) {
+                $body['complemento'] = $params['complemento'];
+            }
+            if (isset($params['bairro'])) {
+                $body['bairro'] = $params['bairro'];
+            }
+        }
+
+        return $this->request('POST', '/valuation/evaluate', null, $body);
     }
 
     // =========================================================================
