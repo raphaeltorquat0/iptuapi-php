@@ -95,7 +95,7 @@ class IPTUClient
      *
      * @param string $logradouro Nome da rua/avenida
      * @param string|null $numero Número do imóvel (opcional)
-     * @param string $cidade Cidade (sp, bh, recife)
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
      * @param array $options Opções adicionais (incluirHistorico, incluirComparaveis, incluirZoneamento)
      * @return array Dados do imóvel encontrado
      * @throws IPTUAPIException
@@ -132,7 +132,7 @@ class IPTUClient
      * Busca dados de IPTU por número SQL (contribuinte).
      *
      * @param string $sql Número SQL do imóvel
-     * @param string $cidade Cidade (sp, bh, recife)
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
      * @param array $options Opções adicionais
      * @return array Dados completos do imóvel
      * @throws IPTUAPIException
@@ -158,7 +158,7 @@ class IPTUClient
      * Busca imóveis por CEP.
      *
      * @param string $cep CEP do imóvel
-     * @param string $cidade Cidade (sp, bh, recife)
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
      * @return array Lista de imóveis no CEP
      * @throws IPTUAPIException
      */
@@ -220,7 +220,7 @@ class IPTUClient
      * @param string $bairro Nome do bairro
      * @param float $areaMin Área mínima em m²
      * @param float $areaMax Área máxima em m²
-     * @param string $cidade Cidade (sp, bh, recife)
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
      * @param int $limit Número máximo de resultados
      * @return array Lista de imóveis comparáveis
      * @throws IPTUAPIException
@@ -307,7 +307,7 @@ class IPTUClient
      * Histórico de valores IPTU de um imóvel.
      *
      * @param string $sql Número SQL do imóvel
-     * @param string $cidade Cidade (sp, bh, recife)
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
      * @return array Lista com histórico anual
      * @throws IPTUAPIException
      */
