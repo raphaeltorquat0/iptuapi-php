@@ -35,7 +35,7 @@ use Psr\Log\NullLogger;
  */
 class IPTUClient
 {
-    public const VERSION = '2.1.0';
+    public const VERSION = '2.0.0';
 
     private const DEFAULT_BASE_URL = 'https://iptuapi.com.br/api/v1';
     private const DEFAULT_TIMEOUT = 30;
@@ -239,64 +239,6 @@ class IPTUClient
             'cidade' => $cidade,
             'limit' => $limit,
         ]);
-    }
-
-    /**
-     * Avalia imóvel por endereço OU número SQL.
-     * Combina dados do modelo AVM (ML) com transações ITBI reais.
-     * Disponível apenas para planos Pro e Enterprise.
-     *
-     * @param array $params Parâmetros da avaliação:
-     *   - sql: Número SQL do imóvel (alternativa ao endereço)
-     *   - logradouro: Nome da rua/avenida (alternativa ao SQL)
-     *   - numero: Número do imóvel
-     *   - complemento: Apartamento, sala, etc.
-     *   - bairro: Bairro
-     *   - cidade: Código da cidade (sp, bh)
-     *   - incluir_itbi: Incluir estimativa baseada em ITBI (default: true)
-     *   - incluir_comparaveis: Incluir imóveis comparáveis (default: true)
-     * @return array Avaliação completa com valor_final, avaliacao_avm, avaliacao_itbi, etc.
-     * @throws IPTUAPIException
-     *
-     * @example Por SQL
-     * $result = $client->valuationEvaluate([
-     *     'sql' => '123.456.0001-0',
-     *     'cidade' => 'sp',
-     * ]);
-     *
-     * @example Por endereço
-     * $result = $client->valuationEvaluate([
-     *     'logradouro' => 'Avenida Paulista',
-     *     'numero' => 1000,
-     *     'cidade' => 'sp',
-     * ]);
-     */
-    public function valuationEvaluate(array $params): array
-    {
-        $body = [
-            'cidade' => $params['cidade'] ?? 'sp',
-            'incluir_itbi' => $params['incluir_itbi'] ?? true,
-            'incluir_comparaveis' => $params['incluir_comparaveis'] ?? true,
-        ];
-
-        if (isset($params['sql'])) {
-            $body['sql'] = $params['sql'];
-        } else {
-            if (isset($params['logradouro'])) {
-                $body['logradouro'] = $params['logradouro'];
-            }
-            if (isset($params['numero'])) {
-                $body['numero'] = $params['numero'];
-            }
-            if (isset($params['complemento'])) {
-                $body['complemento'] = $params['complemento'];
-            }
-            if (isset($params['bairro'])) {
-                $body['bairro'] = $params['bairro'];
-            }
-        }
-
-        return $this->request('POST', '/valuation/evaluate', null, $body);
     }
 
     // =========================================================================
@@ -531,5 +473,92 @@ class IPTUClient
             default:
                 return new IPTUAPIException($message, $statusCode, $this->lastRequestId);
         }
+    }
+
+    // =========================================================================
+    // IPTU Tools Endpoints (Ferramentas IPTU 2026)
+    // =========================================================================
+
+    /**
+     * Lista todas as cidades com calendario de IPTU disponivel.
+     *
+     * @return array Lista de cidades com codigo, nome, desconto e parcelas
+     * @throws IPTUAPIException
+     */
+    public function iptuToolsCidades(): array
+    {
+        return $this->request('GET', '/iptu-tools/cidades');
+    }
+
+    /**
+     * Retorna o calendario completo de IPTU para a cidade especificada.
+     *
+     * @param string $cidade Codigo da cidade (sp, bh, rj, recife, curitiba, poa, fortaleza)
+     * @return array Calendario com vencimentos, descontos, alertas e novidades
+     * @throws IPTUAPIException
+     */
+    public function iptuToolsCalendario(string $cidade = 'sp'): array
+    {
+        return $this->request('GET', '/iptu-tools/calendario', ['cidade' => $cidade]);
+    }
+
+    /**
+     * Simula as opcoes de pagamento do IPTU (a vista vs parcelado).
+     *
+     * @param float $valorIptu Valor total do IPTU
+     * @param string $cidade Codigo da cidade
+     * @param float|null $valorVenal Valor venal do imovel (para verificar isencao)
+     * @return array Comparativo entre pagamento a vista e parcelado com recomendacao
+     * @throws IPTUAPIException
+     */
+    public function iptuToolsSimulador(
+        float $valorIptu,
+        string $cidade = 'sp',
+        ?float $valorVenal = null
+    ): array {
+        $body = [
+            'valor_iptu' => $valorIptu,
+            'cidade' => $cidade,
+        ];
+
+        if ($valorVenal !== null) {
+            $body['valor_venal'] = $valorVenal;
+        }
+
+        return $this->request('POST', '/iptu-tools/simulador', null, $body);
+    }
+
+    /**
+     * Verifica se um imovel e elegivel para isencao de IPTU.
+     *
+     * @param float $valorVenal Valor venal do imovel
+     * @param string $cidade Codigo da cidade
+     * @return array Elegibilidade para isencao total ou parcial
+     * @throws IPTUAPIException
+     */
+    public function iptuToolsIsencao(float $valorVenal, string $cidade = 'sp'): array
+    {
+        return $this->request('GET', '/iptu-tools/isencao', [
+            'valor_venal' => $valorVenal,
+            'cidade' => $cidade,
+        ]);
+    }
+
+    /**
+     * Retorna informacoes sobre o proximo vencimento do IPTU.
+     *
+     * @param string $cidade Codigo da cidade
+     * @param int $parcela Numero da parcela (1-12)
+     * @return array Data de vencimento, dias restantes e status
+     * @throws IPTUAPIException
+     */
+    public function iptuToolsProximoVencimento(
+        string $cidade = 'sp',
+        int $parcela = 1
+    ): array {
+        return $this->request('GET', '/iptu-tools/proximo-vencimento', [
+            'cidade' => $cidade,
+            'parcela' => $parcela,
+        ]);
     }
 }
