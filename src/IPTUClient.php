@@ -351,7 +351,10 @@ class IPTUClient
         for ($attempt = 0; $attempt <= $this->retryConfig->maxRetries; $attempt++) {
             if ($attempt > 0) {
                 $delay = $this->calculateDelay($attempt - 1);
-                $this->logger->warning("Request failed, retrying in {$delay}ms (attempt {$attempt}/{$this->retryConfig->maxRetries})");
+                $maxRetries = $this->retryConfig->maxRetries;
+                $this->logger->warning(
+                    "Request failed, retrying in {$delay}ms (attempt {$attempt}/{$maxRetries})"
+                );
                 usleep($delay * 1000);
             }
 

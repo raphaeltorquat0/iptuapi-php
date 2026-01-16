@@ -1,6 +1,5 @@
 {
     "name": "raphaeltorquat0/iptuapi-php",
-    "version": "2.2.1",
     "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo e Belo Horizonte",
     "type": "library",
     "license": "proprietary",
