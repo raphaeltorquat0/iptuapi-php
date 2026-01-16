@@ -1,0 +1,100 @@
+name: Bug Report
+description: Reportar um bug no SDK
+title: "[Bug]: "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Obrigado por reportar um bug! Preencha as informacoes abaixo para nos ajudar a resolver o problema.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: Verifiquei que nao existe uma issue similar aberta
+          required: true
+        - label: Estou usando a versao mais recente do SDK
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Descricao do Bug
+      description: Descreva claramente o que aconteceu
+      placeholder: O que voce esperava que acontecesse vs o que realmente aconteceu?
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Passos para Reproduzir
+      description: Como podemos reproduzir o problema?
+      placeholder: |
+        1. Criar cliente com...
+        2. Chamar metodo...
+        3. Ver erro...
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Codigo de Exemplo
+      description: Codigo minimo que reproduz o problema
+      render: php
+      placeholder: |
+        <?php
+        use IPTUAPI\IPTUClient;
+
+        $client = new IPTUClient('api_key');
+        $resultado = $client->consultaEndereco('Avenida Paulista');
+
+  - type: textarea
+    id: error
+    attributes:
+      label: Mensagem de Erro / Stack Trace
+      description: Cole a mensagem de erro completa
+      render: shell
+
+  - type: input
+    id: version
+    attributes:
+      label: Versao do SDK
+      placeholder: "2.1.0"
+    validations:
+      required: true
+
+  - type: input
+    id: php-version
+    attributes:
+      label: Versao do PHP
+      placeholder: "8.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Sistema Operacional
+      options:
+        - Linux
+        - macOS
+        - Windows
+        - Outro
+    validations:
+      required: true
+
+  - type: input
+    id: framework
+    attributes:
+      label: Framework (se aplicavel)
+      placeholder: "Laravel 10, Symfony 6, etc"
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Informacoes Adicionais
+      description: Qualquer outra informacao relevante
