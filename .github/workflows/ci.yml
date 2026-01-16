@@ -106,6 +106,9 @@ jobs:
       - name: Validate composer.json
         run: composer validate --strict
 
+      - name: Install dependencies
+        run: composer install --no-progress --prefer-dist
+
       - name: Check dependencies
         run: composer check-platform-reqs
 
