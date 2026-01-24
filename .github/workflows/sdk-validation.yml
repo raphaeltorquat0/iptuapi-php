@@ -49,7 +49,7 @@ jobs:
           php -r "
             require 'vendor/autoload.php';
 
-            use IPTUApi\IPTUClient;
+            use IPTUAPI\IPTUClient;
 
             if (!class_exists(IPTUClient::class)) {
                 echo 'IPTUClient class not found' . PHP_EOL;
@@ -65,7 +65,7 @@ jobs:
           php -r "
             require 'vendor/autoload.php';
 
-            use IPTUApi\IPTUClient;
+            use IPTUAPI\IPTUClient;
 
             \$reflection = new ReflectionClass(IPTUClient::class);
 
@@ -113,7 +113,7 @@ jobs:
           php -r "
             require 'vendor/autoload.php';
 
-            use IPTUApi\IPTUClient;
+            use IPTUAPI\IPTUClient;
 
             echo 'Testing iptuToolsCidades (public endpoint)...' . PHP_EOL;
 
@@ -143,7 +143,7 @@ jobs:
           php -r "
             require 'vendor/autoload.php';
 
-            use IPTUApi\IPTUClient;
+            use IPTUAPI\IPTUClient;
 
             \$apiKey = getenv('IPTU_TEST_API_KEY');
             if (!\$apiKey) {
