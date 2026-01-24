@@ -162,11 +162,7 @@ jobs:
             echo 'Testing consultaEndereco (authenticated endpoint)...' . PHP_EOL;
 
             \$client = new IPTUClient(\$apiKey);
-            \$result = \$client->consultaEndereco([
-                'logradouro' => 'Avenida Paulista',
-                'numero' => '1000',
-                'cidade' => 'sp'
-            ]);
+            \$result = \$client->consultaEndereco('Avenida Paulista', '1000', 'sp');
 
             // Validate response structure
             if (!(\$result['success'] ?? false)) {
