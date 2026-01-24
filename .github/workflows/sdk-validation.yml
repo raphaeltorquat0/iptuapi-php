@@ -1,0 +1,180 @@
+name: SDK Validation
+
+on:
+  workflow_call:
+    secrets:
+      IPTU_TEST_API_KEY:
+        required: true
+  workflow_dispatch:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * *'  # Daily at 6 AM UTC
+
+env:
+  API_BASE_URL: https://api.iptuapi.com.br
+
+jobs:
+  clean-environment-test:
+    name: Clean Environment Test
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.1', '8.2', '8.3']
+    steps:
+      - name: Setup PHP ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+          extensions: curl, json
+          tools: composer
+
+      - name: Create clean test directory
+        run: mkdir -p /tmp/sdk-clean-test
+
+      - name: Initialize Composer project
+        working-directory: /tmp/sdk-clean-test
+        run: |
+          composer init --name="test/sdk-validation" --no-interaction
+          composer config minimum-stability dev
+          composer config prefer-stable true
+
+      - name: Install SDK from Packagist registry
+        working-directory: /tmp/sdk-clean-test
+        run: composer require raphaeltorquat0/iptuapi-php
+
+      - name: Test autoload and import
+        working-directory: /tmp/sdk-clean-test
+        run: |
+          php -r "
+            require 'vendor/autoload.php';
+
+            use IPTUApi\IPTUClient;
+
+            if (!class_exists(IPTUClient::class)) {
+                echo 'IPTUClient class not found' . PHP_EOL;
+                exit(1);
+            }
+
+            echo 'Import successful' . PHP_EOL;
+          "
+
+      - name: Verify class structure
+        working-directory: /tmp/sdk-clean-test
+        run: |
+          php -r "
+            require 'vendor/autoload.php';
+
+            use IPTUApi\IPTUClient;
+
+            \$reflection = new ReflectionClass(IPTUClient::class);
+
+            echo 'IPTUClient class found' . PHP_EOL;
+
+            \$methods = ['iptuToolsCidades', 'consultaEndereco'];
+            foreach (\$methods as \$method) {
+                if (\$reflection->hasMethod(\$method)) {
+                    echo \"Method {\$method} found\" . PHP_EOL;
+                } else {
+                    echo \"Warning: Method {\$method} not found\" . PHP_EOL;
+                }
+            }
+          "
+
+  smoke-test-real-api:
+    name: Smoke Test Real API
+    runs-on: ubuntu-latest
+    needs: clean-environment-test
+    steps:
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl, json
+          tools: composer
+
+      - name: Create test directory
+        run: mkdir -p /tmp/sdk-smoke-test
+
+      - name: Initialize Composer project
+        working-directory: /tmp/sdk-smoke-test
+        run: |
+          composer init --name="test/sdk-smoke" --no-interaction
+          composer config minimum-stability dev
+          composer config prefer-stable true
+
+      - name: Install SDK from Packagist registry
+        working-directory: /tmp/sdk-smoke-test
+        run: composer require raphaeltorquat0/iptuapi-php
+
+      - name: Test public endpoint (iptuToolsCidades)
+        working-directory: /tmp/sdk-smoke-test
+        run: |
+          php -r "
+            require 'vendor/autoload.php';
+
+            use IPTUApi\IPTUClient;
+
+            echo 'Testing iptuToolsCidades (public endpoint)...' . PHP_EOL;
+
+            \$client = new IPTUClient();
+            \$result = \$client->iptuToolsCidades();
+
+            // Validate response structure
+            if (!isset(\$result['cidades']) || !is_array(\$result['cidades'])) {
+                echo 'Expected cidades to be an array' . PHP_EOL;
+                exit(1);
+            }
+
+            if ((\$result['total'] ?? 0) < 9) {
+                echo 'Expected at least 9 cidades, got ' . (\$result['total'] ?? 0) . PHP_EOL;
+                exit(1);
+            }
+
+            echo 'Public endpoint test passed!' . PHP_EOL;
+            echo 'Total cidades: ' . \$result['total'] . PHP_EOL;
+          "
+
+      - name: Test authenticated endpoint (consultaEndereco)
+        working-directory: /tmp/sdk-smoke-test
+        env:
+          IPTU_TEST_API_KEY: ${{ secrets.IPTU_TEST_API_KEY }}
+        run: |
+          php -r "
+            require 'vendor/autoload.php';
+
+            use IPTUApi\IPTUClient;
+
+            \$apiKey = getenv('IPTU_TEST_API_KEY');
+            if (!\$apiKey) {
+                echo 'IPTU_TEST_API_KEY not set' . PHP_EOL;
+                exit(1);
+            }
+
+            echo 'Testing consultaEndereco (authenticated endpoint)...' . PHP_EOL;
+
+            \$client = new IPTUClient(['apiKey' => \$apiKey]);
+            \$result = \$client->consultaEndereco([
+                'logradouro' => 'Avenida Paulista',
+                'numero' => '1000',
+                'cidade' => 'sp'
+            ]);
+
+            // Validate response structure
+            \$sql = \$result['sql'] ?? null;
+            if (!\$sql || !is_string(\$sql) || strlen(\$sql) === 0) {
+                echo 'Expected sql to be a non-empty string' . PHP_EOL;
+                exit(1);
+            }
+
+            echo 'Authenticated endpoint test passed!' . PHP_EOL;
+            echo 'SQL field present: ' . substr(\$sql, 0, 50) . '...' . PHP_EOL;
+          "
+
+      - name: Validation complete
+        run: |
+          echo "All SDK validation tests passed!"
+          echo "- Clean environment install: OK"
+          echo "- PHP autoload: OK"
+          echo "- Public API (iptuToolsCidades): OK"
+          echo "- Authenticated API (consultaEndereco): OK"
