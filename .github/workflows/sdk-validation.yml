@@ -107,17 +107,25 @@ jobs:
         working-directory: /tmp/sdk-smoke-test
         run: composer require raphaeltorquat0/iptuapi-php
 
-      - name: Test public endpoint (iptuToolsCidades)
+      - name: Test iptuToolsCidades endpoint
         working-directory: /tmp/sdk-smoke-test
+        env:
+          IPTU_TEST_API_KEY: ${{ secrets.IPTU_TEST_API_KEY }}
         run: |
           php -r "
             require 'vendor/autoload.php';
 
             use IPTUAPI\IPTUClient;
 
-            echo 'Testing iptuToolsCidades (public endpoint)...' . PHP_EOL;
+            \$apiKey = getenv('IPTU_TEST_API_KEY');
+            if (!\$apiKey) {
+                echo 'IPTU_TEST_API_KEY not set' . PHP_EOL;
+                exit(1);
+            }
 
-            \$client = new IPTUClient();
+            echo 'Testing iptuToolsCidades...' . PHP_EOL;
+
+            \$client = new IPTUClient(\$apiKey);
             \$result = \$client->iptuToolsCidades();
 
             // Validate response structure
@@ -131,7 +139,7 @@ jobs:
                 exit(1);
             }
 
-            echo 'Public endpoint test passed!' . PHP_EOL;
+            echo 'iptuToolsCidades test passed!' . PHP_EOL;
             echo 'Total cidades: ' . \$result['total'] . PHP_EOL;
           "
 
