@@ -1,6 +1,7 @@
 {
     "name": "raphaeltorquat0/iptuapi-php",
-    "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo e Belo Horizonte",
+    "description": "SDK oficial para a IPTU API - Dados de IPTU de São Paulo, Belo Horizonte, Rio de Janeiro e outras cidades",
+    "version": "2.1.2",
     "type": "library",
     "license": "proprietary",
     "keywords": [
@@ -29,6 +30,11 @@
     "autoload": {
         "psr-4": {
             "IPTUAPI\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "IPTUAPI\\Tests\\": "tests/"
         }
     },
     "homepage": "https://iptuapi.com.br",

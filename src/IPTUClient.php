@@ -35,7 +35,7 @@ use Psr\Log\NullLogger;
  */
 class IPTUClient
 {
-    public const VERSION = '2.0.0';
+    public const VERSION = '2.1.2';
 
     private const DEFAULT_BASE_URL = 'https://iptuapi.com.br/api/v1';
     private const DEFAULT_TIMEOUT = 30;
@@ -241,6 +241,19 @@ class IPTUClient
         ]);
     }
 
+    /**
+     * Estatísticas de valores por bairro.
+     *
+     * @param string $bairro Nome do bairro
+     * @param string $cidade Cidade (sp, bh, recife, poa, fortaleza, curitiba, rj, brasilia)
+     * @return array Estatísticas: média, mediana, min, max, etc
+     * @throws IPTUAPIException
+     */
+    public function valuationStatistics(string $bairro, string $cidade = 'sp'): array
+    {
+        return $this->request('GET', "/valuation/statistics/{$bairro}", ['cidade' => $cidade]);
+    }
+
     // =========================================================================
     // Dados Endpoints
     // =========================================================================
@@ -269,6 +282,26 @@ class IPTUClient
     {
         $cnpj = preg_replace('/\D/', '', $cnpj);
         return $this->request('GET', "/dados/cnpj/{$cnpj}");
+    }
+
+    /**
+     * Índice IPCA histórico.
+     *
+     * @param string|null $dataInicio Data inicial (YYYY-MM)
+     * @param string|null $dataFim Data final (YYYY-MM)
+     * @return array Série histórica do IPCA
+     * @throws IPTUAPIException
+     */
+    public function dadosIPCA(?string $dataInicio = null, ?string $dataFim = null): array
+    {
+        $params = [];
+        if ($dataInicio !== null) {
+            $params['data_inicio'] = $dataInicio;
+        }
+        if ($dataFim !== null) {
+            $params['data_fim'] = $dataFim;
+        }
+        return $this->request('GET', '/dados/ipca', $params);
     }
 
     /**
