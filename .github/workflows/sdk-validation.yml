@@ -169,9 +169,14 @@ jobs:
             ]);
 
             // Validate response structure
-            \$sql = \$result['sql'] ?? null;
-            if (!\$sql || !is_string(\$sql) || strlen(\$sql) === 0) {
-                echo 'Expected sql to be a non-empty string' . PHP_EOL;
+            if (!(\$result['success'] ?? false)) {
+                echo 'Expected success to be true' . PHP_EOL;
+                exit(1);
+            }
+
+            \$sql = \$result['dados_iptu']['sql'] ?? null;
+            if (!\$sql || !is_string(\$sql)) {
+                echo 'Expected dados_iptu.sql to be a non-empty string' . PHP_EOL;
                 exit(1);
             }
 
